@@ -35,20 +35,40 @@ var products = [
     },
 ];
 
-var categories = [
-    { id: 1, name: "Produção Própria" },
-    { id: 2, name: "Nacional" },
-    { id: 3, name: "Importado" }
-];
+var categories = [];
 
 //OnLoad
+loadCategories(); // Categorias precisa dar Load primeiro
 loadProducts();
+
+
+//Load all categories
+function loadCategories() {
+    $.ajax({
+        url: "http://localhost:8080/categories", //AJAX para chamadas Síncronas
+        type: "GET",
+        async: false, //Chamada síncrona ---- Uma por vez
+        success: (response) => { // Requisição JSON $
+            categories = response;
+            for (var cat of categories) {
+                document.getElementById("selectCategory").innerHTML += `<option value= ${cat.id}>${cat.name}</option>`;
+            }
+        }
+    });
+}
 
 //Load all products
 function loadProducts() {
-    for (let prod of products) {
-        addNewRow(prod);
-    }
+
+    $.getJSON("http://localhost:8080/products", (response) => { // Requisição JSON $
+
+        products = response;
+        for (let prod of products) {
+            addNewRow(prod);
+        }
+    });
+
+
 }
 
 //save a product
@@ -61,15 +81,25 @@ function save() {
         name: document.getElementById("inputName").value,
         description: document.getElementById("inputDescription").value,
         price: convertToNumber(document.getElementById("inputPrice").value),
-        category: document.getElementById("selectCategory").value,
+        idCategory: document.getElementById("selectCategory").value,
         promotion: document.getElementById("checkBoxPromotion").checked,
-        new: document.getElementById("checkBoxNewProduct").checked
+        newProduct: document.getElementById("checkBoxNewProduct").checked
     };
 
-    addNewRow(prod);
-    products.push(prod);
+    $.ajax({
+        url: "http://localhost:8080/products", //AJAX para chamadas Síncronas
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(prod), // Transforma em JSON
+        async: true, //Chamada síncrona ---- Uma por vez
+        success: (product) => { // Requisição JSON $
+            addNewRow(product);
+            products.push(product);
 
-    document.getElementById("formProduct").reset();
+            document.getElementById("formProduct").reset();
+
+        }
+    });
 
 }
 
@@ -103,17 +133,17 @@ function addNewRow(prod) {
     newRow.insertCell().appendChild(priceNode);
 
     //Insert product category
-    var categoryNode = document.createTextNode(categories[prod.category - 1].name);
+    var categoryNode = document.createTextNode(categories[prod.idCategory - 1].name);
     newRow.insertCell().appendChild(categoryNode);
 
     //Insert product options
     var options = "";
     if (prod.promotion) {
-        options = "<span class='badge bg-success me-1 d-none d-md-table-cell'>P</span>";
+        options = "<span class='badge bg-success me-1'>P</span>";
     }
 
-    if (prod.new) {
-        options += "<span class='badge bg-primary d-none d-md-table-cell'>L</span>";
+    if (prod.newProduct) {
+        options += "<span class='badge bg-primary'>L</span>";
     }
 
     cell = newRow.insertCell();
