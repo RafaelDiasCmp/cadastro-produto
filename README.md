@@ -23,9 +23,6 @@ Este projeto é um sistema de cadastro de produtos desenvolvido com Spring Boot 
 
 - **Java**: Linguagem de programação principal para o desenvolvimento do backend.
 - **Spring Boot**: Framework para criar aplicações Java de maneira simples e produtiva.
-- **Spring Data JPA**: Simplifica a implementação do acesso a dados persistentes.
-- **H2 Database**: Banco de dados em memória utilizado para desenvolvimento e testes.
-- **Thymeleaf**: Motor de templates para renderização do frontend.
 - **Bootstrap**: Framework CSS para um design moderno e responsivo.
 - **Maven**: Gerenciamento de dependências e automação de build.
 
